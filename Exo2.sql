@@ -7,6 +7,7 @@ SELECT
 	sum(upkeeps.points) OVER (
 		PARTITION BY units.id
 		ORDER BY upkeeps.scheduled
+		ROWS 5 PRECEDING
 	) AS cumul
 FROM units
 JOIN upkeeps ON upkeeps.unit_id = units.id;
@@ -31,6 +32,7 @@ BEGIN
 		sum(upkeeps.points) OVER (
 			PARTITION BY units.id
 			ORDER BY upkeeps.scheduled
+			ROWS 5 PRECEDING
 		) AS cumul
 	FROM units
 	JOIN upkeeps ON upkeeps.unit_id = units.id
