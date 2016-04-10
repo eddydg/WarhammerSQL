@@ -1,26 +1,4 @@
-﻿/*
-select * from missions
-join volunteers on volunteers.mission_id = missions.id
-join units on units.id = volunteers.unit_id
-where missions.id = 1
-;
-
-
-select
-	squads.id as squad_id,
-	squads.name as squad_name,
-	units.id as unit_id,
-	units.name as unit_name,
-	scheduled,
-	sum(points)
-from squads
-join units on units.squad_id = squads.id
-join upkeeps on upkeeps.unit_id = units.id
-where squads.id = 12 or squads.id = 15 or squads.id = 5
-group by squads.id, squads.name, units.id, units.name, scheduled
-*/
-
-with missions_squads AS (
+﻿with missions_squads AS (
 	select
 		missions.id as mission_id,
 		missions.name as mission_name,
@@ -41,7 +19,7 @@ dependent_squads AS (
 		missions_squads.squad_id as leader_id
 	from missions_squads
 	join squads on squads.leader_id = missions_squads.squad_id
-		or squads.id = missions_squads.squad_id -- we also include first squad's units
+		or squads.id = missions_squads.squad_id -- we also include first own squad's units
 ),
 squad_unit AS (
 	select
@@ -72,6 +50,6 @@ select
 	name,
 	scheduled,
 	points,
-	sum(points) over (partition by id order by scheduled)
+	sum(points) over (partition by id order by scheduled) as total
 from unbound_mission
 ;
