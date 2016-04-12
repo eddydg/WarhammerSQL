@@ -30,7 +30,12 @@ select
 		(SELECT string_agg(pretty_units.title, E'\n')
 			FROM pretty_units
 			WHERE pretty_units.squad_id = leaders.squad_id),
-		E'\n'
+		E'\n',
+		(SELECT concat(
+				string_agg(pretty_squads.title, E'\n')
+			)
+			FROM pretty_squads
+			WHERE pretty_squads.leader_id = leaders.squad_id)
 	)
 FROM leaders;
 ;
