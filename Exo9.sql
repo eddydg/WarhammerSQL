@@ -21,25 +21,37 @@ WITH leaders AS (
 	SELECT
 		squads.id,
 		squads.leader_id,
-		concat(E'\t(', squads.category, ') ', squads.name, ' [', squads.id, ']') as title
+		concat(
+			E'\t(', squads.category, ') ', squads.name, ' [', squads.id, ']',
+			E'\n',
+			string_agg(
+				concat(
+					E'\t\t',
+					units.name, ' [', units.id, ']'
+				),
+				E'\n'
+			)
+		) as title
 	FROM squads
+	JOIN units ON units.squad_id = squads.id
+	GROUP BY squads.id, squads.leader_id
 )
 select
-	concat(
-		leaders.title,
-		(SELECT string_agg(pretty_units.title, E'\n')
-			FROM pretty_units
-			WHERE pretty_units.squad_id = leaders.squad_id),
-		E'\n',
-		(SELECT concat(
-				string_agg(pretty_squads.title, E'\n')
-			)
-			FROM pretty_squads
-			WHERE pretty_squads.leader_id = leaders.squad_id)
+	string_agg(
+		concat(
+			leaders.title,
+			(SELECT string_agg(pretty_units.title, E'\n')
+				FROM pretty_units
+				WHERE pretty_units.squad_id = leaders.squad_id),
+			E'\n',
+			(SELECT concat(
+					string_agg(pretty_squads.title, E'\n'),
+					E'\n'
+				)
+				FROM pretty_squads
+				WHERE pretty_squads.leader_id = leaders.squad_id)
+		),
+		E'\n'
 	)
 FROM leaders;
 ;
-
-
-
-
